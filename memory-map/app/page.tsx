@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import GroupCard from './components/GroupCard';
 import type { Group } from './types/group';
 
 export default function Home() {
+  
+
   const [groups, setGroups] = useState<Group[]>([
     {
       id: 1,
@@ -22,6 +24,27 @@ export default function Home() {
       description: "大切な場所と写真"
     }
   ]);
+
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const savedGroups = localStorage.getItem('groups');
+
+    if(savedGroups) {
+       // eslint-disable-next-line react-hooks/set-state-in-effect
+      setGroups(JSON.parse(savedGroups));
+    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if(!isLoaded) return;
+
+    localStorage.setItem('groups', JSON.stringify(groups));
+  }, [groups, isLoaded]);
+
+  
 
   const [groupName, setGroupName] = useState('');
 
@@ -70,6 +93,7 @@ export default function Home() {
         value={groupName}
         maxLength={15}
         onChange={(e) => {
+
           setGroupName(e.target.value)
         }}
         placeholder='グループ名を入力'
